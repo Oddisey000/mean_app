@@ -1,0 +1,10 @@
+mat-card {
+  margin-top: 1rem;
+}
+mat-form-field,
+textarea {
+  width: 100%;
+}
+#save_post {
+  margin-top: 1rem;
+}
