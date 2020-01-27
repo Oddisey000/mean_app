@@ -1,12 +1,14 @@
 ul {
   list-style: none;
-  margin: 0;
   padding: 0;
+  margin: 0;
 }
+
 a {
   text-decoration: none;
-  color: #fff;
+  color: white;
 }
+
 .spacer {
   flex: 1 1 auto;
 }
