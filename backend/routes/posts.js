@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 
 const Post = require("../models/post");
+const checkAuth = require('../middleware/check-auth');
 
 const router = express.Router();
 
@@ -32,6 +33,7 @@ const storage = multer.diskStorage({
 
 router.post(
   "",
+  checkAuth,
   multer({ storage: storage }).single("image"),
   (req, res, next) => {
     const url = req.protocol + "://" + req.get("host");
@@ -54,6 +56,7 @@ router.post(
 
 router.put(
   "/:id",
+  checkAuth,
   multer({ storage: storage }).single("image"),
   (req, res, next) => {
     let imagePath = req.body.imagePath;
@@ -75,12 +78,35 @@ router.put(
 );
 
 router.get("", (req, res, next) => {
-  Post.find().then(documents => {
-    res.status(200).json({
-      message: "Posts fetched successfully!",
-      posts: documents
+  // Get query parameter under ? mark
+  const pageSize = +req.query.pageSize; // convert to number
+  const currentPage = +req.query.page; // convert to number
+  const postQuery = Post.find();
+  // Use variable to save resolved data for future conditions
+  let fetchPosts;
+  
+  // Check if there need to be retrive a slice of posts
+  if (pageSize && currentPage) {
+    postQuery
+      // skip all items shown in current page and load next portion of items
+      .skip(pageSize * (currentPage - 1))
+      // Return amount of items defined in front end
+      .limit(pageSize);
+  }
+  postQuery
+    .then(documents => {
+      // Fetch data and count number of posts
+      fetchPosts = documents;
+      return Post.count();
+    })
+    .then(count => {
+      res.status(200).json({
+        // Send back posts information and count of posts
+        message: 'Posts fetching successfuly',
+        posts: fetchPosts,
+        maxPosts: count
+      })
     });
-  });
 });
 
 router.get("/:id", (req, res, next) => {
@@ -93,7 +119,7 @@ router.get("/:id", (req, res, next) => {
   });
 });
 
-router.delete("/:id", (req, res, next) => {
+router.delete("/:id", checkAuth, (req, res, next) => {
   Post.deleteOne({ _id: req.params.id }).then(result => {
     console.log(result);
     res.status(200).json({ message: "Post deleted!" });
