@@ -52,7 +52,8 @@ export class PostService {
           id: responseData.post.id,
           title: title,
           content: content,
-          imagePath: responseData.post.imagePath
+          imagePath: responseData.post.imagePath,
+          creator: responseData.post.creator
         };
         this.posts.push(post);
         this.postsUpdated.next([...this.posts]);
