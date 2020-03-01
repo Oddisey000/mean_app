@@ -61,8 +61,8 @@ export class PostService {
       });
   }
 
-  updatePost(id: string, title: string, content: string) {
-    const post: Post = { id: id, title: title, content: content, imagePath: null };
+  updatePost(id: string, title: string, content: string, creator: string) {
+    const post: Post = { id: id, title: title, content: content, imagePath: null, creator: null };
     this.http.put<{message: string, post: any}>('http://localhost:3000/api/posts/' + id, post)
     .subscribe((response) => {
       console.log(response.message);
